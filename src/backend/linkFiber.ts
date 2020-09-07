@@ -360,6 +360,15 @@ function createTree(
  * @return a function to be invoked by index.js that initiates snapshot monitoring
  * linkFiber contains core module functionality, exported as an anonymous function.
  */
+
+ /*
+Matt's Notes:
+  This function:
+    adds a visibility change Listener which runs the visibility change function which sets the doWork property (for active / inactive tab functionality?)
+    Updates Snapshots (after throttling them)
+    Overrides devTools.onCommitFiberRoot
+    Takes a snapshot
+ */
 export default (snap: Snapshot, mode: Mode): (() => void) => {
   function onVisibilityChange(): void {
     doWork = !document.hidden;
@@ -370,6 +379,13 @@ export default (snap: Snapshot, mode: Mode): (() => void) => {
     const reactInstance = devTools ? devTools.renderers.get(1) : null;
     fiberRoot = devTools.getFiberRoots(1).values().next().value;
 
+
+    /*
+    Matt's Notes:
+
+      Overwrites onCommitFiberRoot function attaching a listener that executes Reactime logic
+      with every commitFiberRoot call.
+*/
     const throttledUpdateSnapshot = throttle(() => updateSnapShotTree(snap, mode), 70);
     document.addEventListener('visibilitychange', onVisibilityChange);
     if (reactInstance && reactInstance.version) {

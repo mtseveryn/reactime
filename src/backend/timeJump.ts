@@ -19,6 +19,11 @@ import 'core-js';
 
 import componentActionsRecord from './masterState';
 
+/*
+Matt's Notes:
+  Guessing this prevents endless loops in recursion...if we've already traversed a fiberNode we add it to this
+  We check it to make sure we're not traversing each fiberNode more than once.
+*/
 const circularComponentTable = new Set();
 
 export default (origin, mode) => {
@@ -34,6 +39,13 @@ export default (origin, mode) => {
     const component = componentActionsRecord.getComponentByIndex(
       target.componentData.index,
     );
+
+    /*
+      Matt's Notes:
+        Handles Class Components?
+        Object.keys resets state properties to undefined if they didn't exist so prev State keys are overwritten
+        with undefined (else they would remain and we wouldn't get an accurate time jump)
+    */
     if (component && component.setState) {
       component.setState(
         prevState => {
@@ -50,6 +62,10 @@ export default (origin, mode) => {
     }
 
     // Check for hooks state and set it with dispatch()
+    /*
+    Matt's Notes:
+      Handles hooks components.
+    */
     if (target.state && target.state.hooksState) {
       target.state.hooksState.forEach(hook => {
         const hooksComponent = componentActionsRecord.getComponentByIndex(
