@@ -7,6 +7,13 @@
  * 'reactime' module has a single export
  * @function linkFiber
  */
+
+
+ /*
+  Matt's Notes:
+    This is injected directly into the DOM. The "backend" folder is bundled via webpack and injected into the DOM via 
+    the background script. That's how many of these functions have direct access to the window object. 
+ */
 import 'core-js';
 import 'regenerator-runtime/runtime';
 import linkFiberStart from './linkFiber';

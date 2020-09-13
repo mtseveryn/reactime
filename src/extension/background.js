@@ -75,10 +75,17 @@ function sendToHierarchy(tabObj, newNode) {
   }
 }
 
+/*
+Matt's Notes:
+  Not sure this has anything to do with actually changing the state. I do think linkFiber or time jump uses the tabsObj, or at least the
+  tabObj at the ID of the current tab, but this currLocation might be some D3 exclusive. Not sure yet. But I can't find anywhere that this
+  actually factors in to rendering to the DOM. When jumpToSnap is called the content script sends a message both to the devTools (via the window)
+  AND the background. 
+*/
 function changeCurrLocation(tabObj, rootNode, index, name) {
   // index comes from the app's main reducer to locate the right current location on tabObj
   // check if current node has the index wanted
-  if (rootNode.index === index) {
+  if (rootNode.index === index) { // MATT'S NOTE: which rootNode on the time line...index = rootNode snap?
     tabObj.currLocation = rootNode;
     // index of current location from where the next node will be a child
     tabObj.currParent = name;
@@ -224,6 +231,8 @@ chrome.runtime.onMessage.addListener((request, sender) => {
           const script = document.createElement('script');
           script.setAttribute('type', 'text/javascript');
           script.setAttribute('src', file);
+          console.log('ReactTimeFile-> ', file);
+          console.log('ReactTimeBody-> ', htmlBody);
           htmlBody.appendChild(script);
         };
         injectScript(chrome.runtime.getURL('bundles/backend.bundle.js'), 'body');

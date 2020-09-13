@@ -86,6 +86,12 @@ export default (origin, mode) => {
     });
   }
 
+  /*
+  Matt's Notes:
+    setState must fire an on commit or something that triggers a snapShort record. Here they're using setState
+    but it's a jump so they don't want to record a snapshot. This disables that record.
+  */
+
   return (target, firstCall = false) => {
     // * Setting mode disables setState from posting messages to window
     mode.jumping = true;

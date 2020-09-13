@@ -341,7 +341,7 @@ function createTree(
     // If this node had state we appended to the children array,
     // so attach children to the newly appended child.
     // Otherwise, attach children to this same node.
-    circularComponentTable.add(child);
+    circularComponentTable.add(child); //Prevents grabbing state from same child more than once -- Matt's Notes skipped if in Circ comp Set
     createTree(child, newNode);
   }
   // Recurse on siblings
@@ -349,6 +349,11 @@ function createTree(
     circularComponentTable.add(sibling);
     createTree(sibling, newNode, true);
   }
+
+  /*
+  Matt's Notes:
+  Child and sibling are from the fiberData Structure. This custom tree will recurse to the end of a child
+  */
 
   return tree;
 }
@@ -403,3 +408,83 @@ export default (snap: Snapshot, mode: Mode): (() => void) => {
     throttledUpdateSnapshot();
   };
 };
+
+/*
+  Matt's Notes (react src code):
+  From react-reconciler/src/ReactWorkTags.js
+
+export const FunctionComponent = 0;
+export const ClassComponent = 1;
+export const IndeterminateComponent = 2; // Before we know whether it is function or class
+export const HostRoot = 3; // Root of a host tree. Could be nested inside another node.
+export const HostPortal = 4; // A subtree. Could be an entry point to a different renderer.
+export const HostComponent = 5;
+export const HostText = 6;
+export const Fragment = 7;
+export const Mode = 8;
+export const ContextConsumer = 9;
+export const ContextProvider = 10;
+export const ForwardRef = 11;
+export const Profiler = 12;
+export const SuspenseComponent = 13;
+export const MemoComponent = 14;
+export const SimpleMemoComponent = 15;
+export const LazyComponent = 16;
+export const IncompleteClassComponent = 17;
+export const DehydratedFragment = 18;
+export const SuspenseListComponent = 19;
+export const FundamentalComponent = 20;
+export const ScopeComponent = 21;
+export const Block = 22;
+export const OffscreenComponent = 23;
+export const LegacyHiddenComponent = 24;
+
+
+From shared/ReactSymbols.js
+
+/ The Symbol used to tag the ReactElement-like types. If there is no native Symbol
+// nor polyfill, then a plain number is used for performance.
+export let REACT_ELEMENT_TYPE = 0xeac7;
+export let REACT_PORTAL_TYPE = 0xeaca;
+export let REACT_FRAGMENT_TYPE = 0xeacb;
+export let REACT_STRICT_MODE_TYPE = 0xeacc;
+export let REACT_PROFILER_TYPE = 0xead2;
+export let REACT_PROVIDER_TYPE = 0xeacd;
+export let REACT_CONTEXT_TYPE = 0xeace;
+export let REACT_FORWARD_REF_TYPE = 0xead0;
+export let REACT_SUSPENSE_TYPE = 0xead1;
+export let REACT_SUSPENSE_LIST_TYPE = 0xead8;
+export let REACT_MEMO_TYPE = 0xead3;
+export let REACT_LAZY_TYPE = 0xead4;
+export let REACT_BLOCK_TYPE = 0xead9;
+export let REACT_SERVER_BLOCK_TYPE = 0xeada;
+export let REACT_FUNDAMENTAL_TYPE = 0xead5;
+export let REACT_SCOPE_TYPE = 0xead7;
+export let REACT_OPAQUE_ID_TYPE = 0xeae0;
+export let REACT_DEBUG_TRACING_MODE_TYPE = 0xeae1;
+export let REACT_OFFSCREEN_TYPE = 0xeae2;
+export let REACT_LEGACY_HIDDEN_TYPE = 0xeae3;
+
+if (typeof Symbol === 'function' && Symbol.for) {
+  const symbolFor = Symbol.for;
+  REACT_ELEMENT_TYPE = symbolFor('react.element');
+  REACT_PORTAL_TYPE = symbolFor('react.portal');
+  REACT_FRAGMENT_TYPE = symbolFor('react.fragment');
+  REACT_STRICT_MODE_TYPE = symbolFor('react.strict_mode');
+  REACT_PROFILER_TYPE = symbolFor('react.profiler');
+  REACT_PROVIDER_TYPE = symbolFor('react.provider');
+  REACT_CONTEXT_TYPE = symbolFor('react.context');
+  REACT_FORWARD_REF_TYPE = symbolFor('react.forward_ref');
+  REACT_SUSPENSE_TYPE = symbolFor('react.suspense');
+  REACT_SUSPENSE_LIST_TYPE = symbolFor('react.suspense_list');
+  REACT_MEMO_TYPE = symbolFor('react.memo');
+  REACT_LAZY_TYPE = symbolFor('react.lazy');
+  REACT_BLOCK_TYPE = symbolFor('react.block');
+  REACT_SERVER_BLOCK_TYPE = symbolFor('react.server.block');
+  REACT_FUNDAMENTAL_TYPE = symbolFor('react.fundamental');
+  REACT_SCOPE_TYPE = symbolFor('react.scope');
+  REACT_OPAQUE_ID_TYPE = symbolFor('react.opaque.id');
+  REACT_DEBUG_TRACING_MODE_TYPE = symbolFor('react.debug_trace_mode');
+  REACT_OFFSCREEN_TYPE = symbolFor('react.offscreen');
+  REACT_LEGACY_HIDDEN_TYPE = symbolFor('react.legacy_hidden');
+*/
